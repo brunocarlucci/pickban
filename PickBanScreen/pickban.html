@@ -1,7 +1,7 @@
 <html>
 	<head>
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script type="text/javascript" src="js/pickban.js"></script>
 
 
@@ -12,51 +12,66 @@
 	<body bgcolor="#222">
 		<div id="background">
 			<div id="map"><img src="images/Dota2_Minimap.png" style="height:955px">
-				<img class="minimap-dire-hero1" src="images/minimapicons/abaddon.png">
-				<img class="minimap-dire-hero2" src="images/minimapicons/alchemist.png">
-				<img class="minimap-dire-hero3" src="images/minimapicons/ancient_apparition.png">
-				<img class="minimap-dire-hero4" src="images/minimapicons/antimage.png">
-				<img class="minimap-dire-hero5" src="images/minimapicons/axe.png">
+				<img id="radiantlogo" src="images/teamlogos/300px-Alliance.png" style="position: absolute; width:75px; top:760px; left:80px;">
+				<img src="images/teamlogos/NaVi.png" style="position: absolute; width:75px; top:135px; left:800px;">
+				<div class="balloon balloon-dire-hero1" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-dire-hero2" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-dire-hero3" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-dire-hero4" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-dire-hero5" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
 				
-				<img class="minimap-radiant-hero1" src="images/minimapicons/abaddon.png">
-				<img class="minimap-radiant-hero2" src="images/minimapicons/alchemist.png">
-				<img class="minimap-radiant-hero3" src="images/minimapicons/ancient_apparition.png">
-				<img class="minimap-radiant-hero4" src="images/minimapicons/antimage.png">
-				<img class="minimap-radiant-hero5" src="images/minimapicons/axe.png">
+				<div class="balloon balloon-radiant-hero1" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-radiant-hero2" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-radiant-hero3" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-radiant-hero4" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				<div class="balloon balloon-radiant-hero5" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
+				
+				
+				<img class="minimap-dire-hero1" src="images/minimapicons/abaddon.png" >
+				<img class="minimap-dire-hero2" src="images/minimapicons/alchemist.png" >
+				<img class="minimap-dire-hero3" src="images/minimapicons/ancient_apparition.png" >
+				<img class="minimap-dire-hero4" src="images/minimapicons/antimage.png" >
+				<img class="minimap-dire-hero5" src="images/minimapicons/axe.png" >
+				
+				<img class="minimap-radiant-hero1" src="images/minimapicons/abaddon.png" >
+				<img class="minimap-radiant-hero2" src="images/minimapicons/alchemist.png" >
+				<img class="minimap-radiant-hero3" src="images/minimapicons/ancient_apparition.png" > 
+				<img class="minimap-radiant-hero4" src="images/minimapicons/antimage.png" >
+				<img class="minimap-radiant-hero5" src="images/minimapicons/axe.png" >
 				
 			</div>
 			<div id="draft">
 			
-				<video autoplay loop class="radiant portrait hero1">
+				<video autoplay loop class="radiant portrait hero1" id="radiantpick1" >
 					<source src="webm/npc_dota_hero_alchemist.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="radiant portrait hero2">
+				<video autoplay loop class="radiant portrait hero2" id="radiantpick2" >
 					<source src="webm/npc_dota_hero_ancient_apparition.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="radiant portrait hero3">
+				<video autoplay loop class="radiant portrait hero3" id="radiantpick3" >
 					<source src="webm/npc_dota_hero_antimage.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="radiant portrait hero4">
+				<video autoplay loop class="radiant portrait hero4" id="radiantpick4" >
 					<source src="webm/npc_dota_hero_axe.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="radiant portrait hero5">
+				<video autoplay loop class="radiant portrait hero5" id="radiantpick5" >
 					<source src="webm/npc_dota_hero_bane.webm" type="video/webm">
 				</video>
 				<br/>
 				
-				<video autoplay loop class="dire portrait hero1">
+				<video autoplay loop class="dire portrait hero1" id="direpick1" >
 					<source src="webm/npc_dota_hero_batrider.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="dire portrait hero2">
+				<video autoplay loop class="dire portrait hero2" id="direpick2" >
 					<source src="webm/npc_dota_hero_beastmaster.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="dire portrait hero3">
+				<video autoplay loop class="dire portrait hero3" id="direpick3" >
 					<source src="webm/npc_dota_hero_bloodseeker.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="dire portrait hero4">
+				<video autoplay loop class="dire portrait hero4" id="direpick4" >
 					<source src="webm/npc_dota_hero_bounty_hunter.webm" type="video/webm">
 				</video>
-				<video autoplay loop class="dire portrait hero5">
+				<video autoplay loop class="dire portrait hero5" id="direpick5" >
 					<source src="webm/npc_dota_hero_brewmaster.webm" type="video/webm">
 				</video>
 				
@@ -74,18 +89,30 @@
 					<p style="position:absolute; left:190px; top:290px;">Pick number</p>
 					<p style="position:absolute; left:560px; top:290px;">Winrate (global)</p>
 				</div>
+				<div id="players" >
+					<img class="player-portrait dire-portrait portrait1" src="images/playerlogos/navi/dendi.jpg"/>
+					<img class="player-portrait dire-portrait portrait2" src="images/playerlogos/navi/funn1k.jpg"/>
+					<img class="player-portrait dire-portrait portrait3" src="images/playerlogos/navi/kuroky.jpg"/>
+					<img class="player-portrait dire-portrait portrait4" src="images/playerlogos/navi/puppey.jpg"/>
+					<img class="player-portrait dire-portrait portrait5" src="images/playerlogos/navi/xboct.jpg"/>
+					<hr/>
+					<img class="player-portrait radiant-portrait portrait1" src="images/playerlogos/alliance/loda.jpg"/>
+					<img class="player-portrait radiant-portrait portrait2" src="images/playerlogos/alliance/s4.jpg"/>
+					<img class="player-portrait radiant-portrait portrait3" src="images/playerlogos/alliance/bld.jpg"/>
+					<img class="player-portrait radiant-portrait portrait4" src="images/playerlogos/alliance/ake.jpg"/>
+					<img class="player-portrait radiant-portrait portrait5" src="images/playerlogos/alliance/egm.jpg"/>
+				</div>
+				<img class="direhero1 ban" id="direban1" src="images/banicons/abaddon.png" >
+				<img class="direhero2 ban" id="direban2" src="images/banicons/alchemist.png" >
+				<img class="direhero3 ban" id="direban3" src="images/banicons/clockwerk.png" >
+				<img class="direhero4 ban" id="direban4" src="images/banicons/enigma.png" >
+				<img class="direhero5 ban" id="direban5" src="images/banicons/pudge.png" >
 				
-				<img class="direhero1 ban" src="images/banicons/80px-Abaddon.png">
-				<img class="direhero2 ban" src="images/banicons/80px-Alchemist.png">
-				<img class="direhero3 ban" src="images/banicons/80px-Clockwerk.png">
-				<img class="direhero4 ban" src="images/banicons/80px-Enigma.png">
-				<img class="direhero5 ban" src="images/banicons/80px-Pudge.png">
-				
-				<img class="radianthero1 ban" src="images/banicons/80px-Faceless_Void.png">
-				<img class="radianthero2 ban" src="images/banicons/80px-Slardar.png">
-				<img class="radianthero3 ban" src="images/banicons/80px-Enchantress.png">
-				<img class="radianthero4 ban" src="images/banicons/80px-Sniper.png">
-				<img class="radianthero5 ban" src="images/banicons/80px-Visage.png">
+				<img class="radianthero1 ban" id="radiantban1" src="images/banicons/faceless_void.png" >
+				<img class="radianthero2 ban" id="radiantban2" src="images/banicons/slardar.png" >
+				<img class="radianthero3 ban" id="radiantban3" src="images/banicons/enchantress.png" >
+				<img class="radianthero4 ban" id="radiantban4" src="images/banicons/sniper.png" >
+				<img class="radianthero5 ban" id="radiantban5" src="images/banicons/visage.png" >
 				
 				<div id="fanbar">
 					<div id="votedire"></div>

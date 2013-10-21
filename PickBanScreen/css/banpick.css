@@ -1,13 +1,42 @@
-#background{display:table-row}
+
+
+@font-face
+{
+font-family: font8bit	;
+src: url('../fonts/BitDarling10(sRB).TTF');
+}
+
+			hr{
+			    border: 0;
+			    height: 0; /* Firefox... */
+			    box-shadow: 0 0 10px 1px black;
+			    top: 274px;
+				position: absolute;
+				left: 8px;
+				width: 750px;
+			}
+			hr:after {  /* Not really supposed to work, but does */
+			    content: "\00a0";  /* Prevent margin collapse */}
+
+			#background{display:table-row}
 			#map{display:table-cell; width:988px; position:relative}
 			#draft{display:table-cell; width:1000px; position:relative}
-			#info{background-color:#888; position:absolute; width:774px; height:568px; top:173px; left:-38px;}
+			#info, #players{background-color:#888; position:absolute; width:774px; height:568px; top:173px; left:-38px;}
 			#fanbar{background-color: #F00; position:absolute; width:25px; height:840px; top:38px;left:825px}
 			#votedire{height:50%; background-color:#0F0}
-			.radiant{top:37px;}
-			.dire{top:761px;}
 			
-			.portrait{ width:117px; position: absolute; 
+			.balloon{font-family:font8bit; background-color:transparent; background:url(../images/wigflip-ds.png); width:150px; height:100px;
+				background-repeat: no-repeat;
+    			background-size: 100% 100%;
+    			background-origin: content-box;
+    			display:none;
+        	}
+        	.balloon p{position:absolute; left:13px; top:0px; }
+        	
+			.dire{top:37px;}
+			.radiant{top:761px;}
+			
+			.portrait{ width:117px; height:117px; position: absolute; 
 			-webkit-box-shadow: 0px 0px 40px rgba(0,255,255,0.8); -moz-box-shadow: 0px 0px 40px rgba(0,255,255,0.8); box-shadow: 0px 0px 40px rgba(0,255,255,0.8);}
 			
 			.hero1{left:0px;}
@@ -42,3 +71,12 @@
 			.minimap-dire-hero3{position:absolute; width:64px; left:715px; top:220px;}
 			.minimap-dire-hero4{position:absolute; width:64px; left:768px; top:255px;}
 			.minimap-dire-hero5{position:absolute; width:64px; left:828px; top:265px;}
+			
+			.player-portrait{width:129px; height:175px; position:absolute;}
+			.portrait1 {left:20px;}
+			.portrait2 {left:169px;}
+			.portrait3 {left:318px;}
+			.portrait4 {left:467px;}
+			.portrait5 {left:616px;}
+			.dire-portrait{top:20px;}			
+			.radiant-portrait{top:373px;}
