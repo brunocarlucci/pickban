@@ -1,19 +1,71 @@
+var players= {'navi':['XBOCT','Dendi','Funn1k','Puppey','KurokY'],
+			  'alliance':['Loda','S4','AdmiralBulldog','Akke','EGM'],
+			  'vp':['LightOfHeaven','God','Solo','NS','Ars-Art'],
+			  'fnatic':['Era','H4nni','Trixi','N0tail','Fly'],
+			  'liquid':['TC','Bulba','qojqva','FLUFFNSTUFF','waytosexy'],
+			  'eg':['Jeyo','MSS','Universe','Fear','Fogged'],
+}; //List of players for this competition
+
+
+function showInfoStats()
+{
+	$("#skillsvideo")[0].pause();
+	$("#skills").hide();
+	$("#info").hide();
+	$("#players").hide();
+	$("#teams").hide();
+	$("#info").show("slide");
+}
+
+function showInfoTeams()
+{
+	$("#skillsvideo")[0].pause();
+	$("#skills").hide();
+	$("#info").hide();
+	$("#players").hide();
+	$("#teams").hide();
+	$("#teams").show("slide");
+}
+
+function showInfoPlayers()
+{
+	$("#skillsvideo")[0].pause();
+	$("#skills").hide();
+	$("#info").hide();
+	$("#players").hide();
+	$("#teams").hide();
+	$("#players").show("slide");
+}
+
+function showInfoSkills()
+{
+	$("#info").hide();
+	$("#players").hide();
+	$("#teams").hide();
+	$("#skills").show("slide",1000,function(){$("#skillsvideo")[0].play();});
+	
+}
+
 setBan= function(side, number, hero)
 {
 	$("#" + side +"ban" + number)[0].src="images/banicons/" + hero + ".png";
 	$("#" + side +"ban" + number).show("slide",1000);
 };
+pickedheroes={radiant:[],dire:[]};
 
 setPick= function(side, number, hero)
 {
 	$("#" + side +"pick" + number)[0].src="webm/npc_dota_hero_" + hero + ".webm";
 	$("#" + side +"pick" + number)[0].play();
+	$("#" + side +"pickname" + number).text(hero);
+	$("#" + side +"pickname" + number).show();
 	$("#" + side +"pick" + number).show("scale",1000, function(){$("#" + side +"pick" + number)[0].play();});
 	$(".minimap-" + side+"-hero" + number)[0].src="images/minimapicons/" + hero + ".png";
 	$(".minimap-" + side+"-hero" + number).show("pulsate");
-	
+	pickedheroes[side].concat(hero);
 	
 };
+
 
 
 $(function () {
@@ -55,7 +107,7 @@ $(function () {
                     cursor: 'pointer',
                     dataLabels: {
 			                    enabled: true,
-			                    distance: -20,
+			                    distance: -50,
 		                     format: '{point.name}<br/> {point.percentage:.1f} %',
 
 			                    style: {
@@ -257,8 +309,8 @@ $(function () {
     });
     
     
-var radiantlanes={top:[],mid:[],bottom:[],junglesafe:[]}; //Top, Mid, Bottom, Jungle
-var direlanes={top:[],mid:[],bottom:[],junglesafe:[]}; //Top, Mid, Bottom, Jungle
+var radiantlanes={top:[],mid:[],bottom:[],junglesafe:[],jungleoff:[]}; //Top, Mid, Bottom, Jungle
+var direlanes={top:[],mid:[],bottom:[],junglesafe:[],jungleoff:[]}; //Top, Mid, Bottom, Jungle
 
 var movepositions = {
 	diremid1:['715','220',300, 
@@ -334,11 +386,13 @@ goToLane = function(target, lane, side, patrol)
 			}
 			else
 			{
-				$("."+balloon).hide("scale");
+				$("."+balloon2).hide("scale");
 			}
 		}
 	};
-	
+	$("."+balloon).css('left',($("."+hero).position().left-10)+"px");
+	$("."+balloon).css('top',($("."+hero).position().top-100)+"px");
+	 
 	$("."+balloon).show("bounce",1000,partial(goToLane2,hero,balloon, lane, side, patrol, 0));
 	
 	
@@ -403,3 +457,61 @@ bounce = function(){
 	
 	$(".balloon").show("bounce",1000);
 } ;
+
+
+
+opposinglane={mid:'mid',bottom:'top',top:'bottom',junglesafe:'jungleoff',jungleoff:'junglesafe'};
+
+getEnemy=function(side, lane){
+	if (side=='radiant')
+	{
+		return direlanes[opposinglane[lane]];
+	}
+	else
+	{
+		return radiantlanes[opposinglane[lane]];
+	}
+};
+
+getAlly=function(side, lane){
+	if (side=='radiant')
+	{
+		return radiantlanes[lane];
+	}
+	else
+	{
+		return direlanes[lane];
+	}
+};
+
+function setTeams(team1, team2, bestof, score1, score2,teaminfo)
+{
+	$("#radiantlogo")[0].src="images/teamlogos/"+team1+".png";
+	$("#direlogo")[0].src="images/teamlogos/"+team2+".png";
+	if (bestof==="Bo5")
+	{
+		$("#radiantscore")[0].src="images/assets/bo5-"+score1+".png";
+		$("#direscore")[0].src="images/assets/bo5-"+score2+".png";
+	}
+	else if (bestof==="Bo1")
+	{
+		$("#radiantscore")[0].src="images/assets/bo1-0.png";
+		$("#direscore")[0].src="images/assets/bo1-0.png";
+	}
+	else
+	{
+		$("#radiantscore")[0].src="images/assets/bo3-"+score1+".png";
+		$("#direscore")[0].src="images/assets/bo3-"+score2+".png";
+	}
+	
+	for(var i=1;i<6;i++)
+	{
+		$("#radiantportrait"+i)[0].src="images/playerlogos/"+team1+"/" + i + ".jpg";
+		$("#radiantplayername"+i).text(players[team1][i-1]);
+		$("#direportrait"+i)[0].src="images/playerlogos/"+team2+"/" + i + ".jpg";
+		$("#direplayername"+i).text(players[team2][i-1]);
+	}
+	
+	
+	
+}

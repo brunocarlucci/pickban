@@ -2,7 +2,11 @@
 	<head>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 		<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+		<script type="text/javascript" src="js/socket.io/socket.io.min.js"></script>
 <script type="text/javascript" src="js/pickban.js"></script>
+<script type="text/javascript" src="js/pickban.banter.js"></script>
+<script type="text/javascript" src="js/pickban.comm.js"></script>
+
 
 
 
@@ -12,8 +16,10 @@
 	<body bgcolor="#222">
 		<div id="background">
 			<div id="map"><img src="images/Dota2_Minimap.png" style="height:955px">
-				<img id="radiantlogo" src="images/teamlogos/300px-Alliance.png" style="position: absolute; width:75px; top:760px; left:80px;">
-				<img src="images/teamlogos/NaVi.png" style="position: absolute; width:75px; top:135px; left:800px;">
+				<img id="radiantlogo" src="images/teamlogos/alliance.png" >
+				<img id="radiantscore" src="images/assets/bo5-1.png" >
+				<img id="direlogo" src="images/teamlogos/navi.png" >
+				<img id="direscore" src="images/assets/bo5-2.png" >
 				<div class="balloon balloon-dire-hero1" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
 				<div class="balloon balloon-dire-hero2" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
 				<div class="balloon balloon-dire-hero3" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
@@ -27,21 +33,31 @@
 				<div class="balloon balloon-radiant-hero5" style="left:650px;top:0px; position:absolute"><p>Mid or I feed!</p></div>
 				
 				
-				<img class="minimap-dire-hero1" src="images/minimapicons/abaddon.png" >
-				<img class="minimap-dire-hero2" src="images/minimapicons/alchemist.png" >
-				<img class="minimap-dire-hero3" src="images/minimapicons/ancient_apparition.png" >
-				<img class="minimap-dire-hero4" src="images/minimapicons/antimage.png" >
-				<img class="minimap-dire-hero5" src="images/minimapicons/axe.png" >
+				<img class="minimap-hero minimap-dire-hero1" src="images/minimapicons/abaddon.png" >
+				<img class="minimap-hero minimap-dire-hero2" src="images/minimapicons/alchemist.png" >
+				<img class="minimap-hero minimap-dire-hero3" src="images/minimapicons/ancient_apparition.png" >
+				<img class="minimap-hero minimap-dire-hero4" src="images/minimapicons/antimage.png" >
+				<img class="minimap-hero minimap-dire-hero5" src="images/minimapicons/axe.png" >
 				
-				<img class="minimap-radiant-hero1" src="images/minimapicons/abaddon.png" >
-				<img class="minimap-radiant-hero2" src="images/minimapicons/alchemist.png" >
-				<img class="minimap-radiant-hero3" src="images/minimapicons/ancient_apparition.png" > 
-				<img class="minimap-radiant-hero4" src="images/minimapicons/antimage.png" >
-				<img class="minimap-radiant-hero5" src="images/minimapicons/axe.png" >
+				<img class="minimap-hero minimap-radiant-hero1" src="images/minimapicons/abaddon.png" >
+				<img class="minimap-hero minimap-radiant-hero2" src="images/minimapicons/alchemist.png" >
+				<img class="minimap-hero minimap-radiant-hero3" src="images/minimapicons/ancient_apparition.png" > 
+				<img class="minimap-hero minimap-radiant-hero4" src="images/minimapicons/antimage.png" >
+				<img class="minimap-hero minimap-radiant-hero5" src="images/minimapicons/axe.png" >
 				
 			</div>
 			<div id="draft">
-			
+				<div id="direpickname1" class="dire-hero-name heroname1"> </div>
+				<div id="direpickname2" class="dire-hero-name heroname2"> </div>
+				<div id="direpickname3" class="dire-hero-name heroname3"> </div>
+				<div id="direpickname4" class="dire-hero-name heroname4"> </div>
+				<div id="direpickname5" class="dire-hero-name heroname5"> </div>
+				
+				<div id="radiantpickname1" class="radiant-hero-name heroname1"> </div>
+				<div id="radiantpickname2" class="radiant-hero-name heroname2"> </div>
+				<div id="radiantpickname3" class="radiant-hero-name heroname3" > </div>
+				<div id="radiantpickname4" class="radiant-hero-name heroname4"> </div>
+				<div id="radiantpickname5" class="radiant-hero-name heroname5"> </div>
 				<video autoplay loop class="radiant portrait hero1" id="radiantpick1" >
 					<source src="webm/npc_dota_hero_alchemist.webm" type="video/webm">
 				</video>
@@ -77,31 +93,59 @@
 				
 				
 				<div id="info" >
-					<div id="container" style="background-color:#888;position:absolute; top:50px; left:10px; width: 400px; height: 250px; margin: 0 auto"></div>
+					<div id="container" style="background-color:#888;position:absolute; top:100px; left:160px; width: 600px; height: 375px; margin: 0 auto"> </div>
+					<video autoplay loop style="position:absolute; top:190px;left:50px; width:200px" >
+						<source src="webm/npc_dota_hero_windrunner.webm" type="video/webm">
+					</video>
+<!--					<div id="container2" style="position:absolute; top:50px; left:400px; width: 400px; height: 250px; margin: 0 auto"> </div>
 					
-					<div id="container2" style="position:absolute; top:50px; left:400px; width: 400px; height: 250px; margin: 0 auto"></div>
-					
-					<div id="container3" style="position:absolute; top:320px; left:10px; width: 400px; height: 250px; margin: 0 auto"></div>
-					<div id="container4" style="position:absolute; top:320px; left:320px; width: 400px; height: 250px; margin: 0 auto"></div>
-					<p style="position:absolute; left:80px; top:10px;">Times banned/picked in the last 3 months (Global)</p>
-					<p style="position:absolute; left:440px; top:10px;">Times banned/picked in the last 3 months (Team)</p>
+					<div id="container3" style="position:absolute; top:320px; left:10px; width: 400px; height: 250px; margin: 0 auto"> </div>
+					<div id="container4" style="position:absolute; top:320px; left:320px; width: 400px; height: 250px; margin: 0 auto"> </div> -->
+					<p style="position:absolute; left:290px; top:450px;">Times banned/picked in the last 3 months (Global)</p>
+					<p style="position:absolute; left:280px; top:0px; font-size:40px;">Windrunner</p>
+					<!--<p style="position:absolute; left:440px; top:10px;">Times banned/picked in the last 3 months (Team)</p>
 					
 					<p style="position:absolute; left:190px; top:290px;">Pick number</p>
-					<p style="position:absolute; left:560px; top:290px;">Winrate (global)</p>
+					<p style="position:absolute; left:560px; top:290px;">Winrate (global)</p>-->
 				</div>
 				<div id="players" >
-					<img class="player-portrait dire-portrait portrait1" src="images/playerlogos/navi/dendi.jpg"/>
-					<img class="player-portrait dire-portrait portrait2" src="images/playerlogos/navi/funn1k.jpg"/>
-					<img class="player-portrait dire-portrait portrait3" src="images/playerlogos/navi/kuroky.jpg"/>
-					<img class="player-portrait dire-portrait portrait4" src="images/playerlogos/navi/puppey.jpg"/>
-					<img class="player-portrait dire-portrait portrait5" src="images/playerlogos/navi/xboct.jpg"/>
+					<img id="direportrait1" class="player-portrait dire-portrait portrait1" src="images/playerlogos/navi/1.jpg"/><div id="direplayername1" class="dire-player-name name1">Dendi</div>
+					<img id="direportrait2" class="player-portrait dire-portrait portrait2" src="images/playerlogos/navi/2.jpg"/><div id="direplayername2" class="dire-player-name name2">Funn1k</div>
+					<img id="direportrait3" class="player-portrait dire-portrait portrait3" src="images/playerlogos/navi/3.jpg"/><div id="direplayername3" class="dire-player-name name3">Kuroky</div>
+					<img id="direportrait4" class="player-portrait dire-portrait portrait4" src="images/playerlogos/navi/4.jpg"/><div id="direplayername4" class="dire-player-name name4">Puppey</div>
+					<img id="direportrait5" class="player-portrait dire-portrait portrait5" src="images/playerlogos/navi/5.jpg"/><div id="direplayername5" class="dire-player-name name5">XBOCT</div>
 					<hr/>
-					<img class="player-portrait radiant-portrait portrait1" src="images/playerlogos/alliance/loda.jpg"/>
-					<img class="player-portrait radiant-portrait portrait2" src="images/playerlogos/alliance/s4.jpg"/>
-					<img class="player-portrait radiant-portrait portrait3" src="images/playerlogos/alliance/bld.jpg"/>
-					<img class="player-portrait radiant-portrait portrait4" src="images/playerlogos/alliance/ake.jpg"/>
-					<img class="player-portrait radiant-portrait portrait5" src="images/playerlogos/alliance/egm.jpg"/>
+					<img id="radiantportrait1" class="player-portrait radiant-portrait portrait1" src="images/playerlogos/alliance/1.jpg"/><div id="radiantplayername1" class="radiant-player-name name1">Loda</div>
+					<img id="radiantportrait2" class="player-portrait radiant-portrait portrait2" src="images/playerlogos/alliance/2.jpg"/><div id="radiantplayername2" class="radiant-player-name name2">S4</div>
+					<img id="radiantportrait3" class="player-portrait radiant-portrait portrait3" src="images/playerlogos/alliance/3.jpg"/><div id="radiantplayername3" class="radiant-player-name name3">AdmiralBulldog</div>
+					<img id="radiantportrait4" class="player-portrait radiant-portrait portrait4" src="images/playerlogos/alliance/4.jpg"/><div id="radiantplayername4" class="radiant-player-name name4">Akke</div>
+					<img id="radiantportrait5" class="player-portrait radiant-portrait portrait5" src="images/playerlogos/alliance/5.jpg"/><div id="radiantplayername5" class="radiant-player-name name5">EGM</div>
 				</div>
+				<div id="teams" >
+					<img id="direteam"  src="images/teamlogos/navi.png"/> 
+					
+					<hr/>
+					
+					<img id="radiantteam" src="images/teamlogos/alliance.png"/>
+					<div id="direinfo">This competition: 12 points (2nd)<br/>
+						This month: 24-12 (66%)<br/>
+						Last Match: vs Liquid (2-0)
+					</div>
+					
+					<div id="radiantinfo">This competition: 13 points (1st)<br/>
+						This month: 22-1 (97%)<br/>
+						Last Match: vs Liquid (2-0)
+					</div>
+					
+				</div>
+				
+				<div id="skills" style="display:none">
+					<div style="position: absolute; top: 50px; left: 50px; font-size:50px"> Abaddon - Aphotic Shield.</div>
+						<video id="skillsvideo" loop  style="width:700px; position: absolute; top:150px; left:37">							<source src="skills/abaddon aphotic shield.mp4"> </source>
+						</video>				
+				</div>
+				
+				
 				<img class="direhero1 ban" id="direban1" src="images/banicons/abaddon.png" >
 				<img class="direhero2 ban" id="direban2" src="images/banicons/alchemist.png" >
 				<img class="direhero3 ban" id="direban3" src="images/banicons/clockwerk.png" >

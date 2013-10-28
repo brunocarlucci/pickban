@@ -1,0 +1,9 @@
+{
+   "name": "pickban",
+   "description": "The Pick/Ban version",
+   "version": "0.1.0",
+   "dependencies": {
+      "express": "latest",
+      "socket.io": "latest"
+   }
+}

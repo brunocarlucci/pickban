@@ -1,38 +1,565 @@
 <html>
+	<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="js/socket.io/socket.io.min.js"></script>
+<script>
+var radiantfirst=true; //who has first pick
+var currentbanpick=1; //next banpick number (1-20)
+var sides = ['radiant','dire']; 
+var selectedmovepick=1; //Selected pick for moving orders
+
+var bans={1:[0,1],2:[1,1],3:[0,2],4:[1,2],9:[0,3],10:[1,3],11:[0,4],12:[1,4],17:[0,5],18:[1,5]}; //which picks are bans and which bans they are.
+
+var movepick={1:0, 2:0,3:0,4:0,
+			  5:6,6:1,7:2,8:7,
+			  9:0,10:0,11:0,12:0,
+			  13:3,14:8,15:4,16:9,
+			  17:0,18:0,19:5,20:10 }; //which picks are picks and where they are if radiant picks first
+
+var movepickdire={1:0, 2:0,3:0,4:0,
+			  5:1,6:6,7:7,8:2,
+			  9:0,10:0,11:0,12:0,
+			  13:8,14:3,15:9,16:4,
+			  17:0,18:0,19:10,20:5 }; //which picks are picks and where they are if dire picks first
+			  
+var players= {'navi':['XBOCT','Dendi','Funn1k','Puppey','KurokY'],
+			  'alliance':['Loda','S4','AdmiralBulldog','Akke','EGM'],
+			  'vp':['LightOfHeaven','God','Solo','NS','Ars-Art'],
+			  'fnatic':['Era','H4nni','Trixi','N0tail','Fly'],
+			  'liquid':['TC','Bulba','qojqva','FLUFFNSTUFF','waytosexy'],
+			  'eg':['Fear','Jeyo','Fogged','Universe','MSS'],
+}; //List of players for this competition
+
+var test;
+
+
+var socket = io.connect('http://localhost:3700');
+
+
+        $(document).ready(function() {
+        	
+        	//Radiant has first pick.
+        	$("#radiantfirstradio").click(function(){
+        		$("#radiantfirst").show();
+        		$("#direfirst").hide();
+        		radiantfirst=true;
+        	});
+        	
+        	//Dire has first pick
+        	$("#direfirstradio").click(function(){
+        		$("#radiantfirst").hide();
+        		$("#direfirst").show();
+        		radiantfirst=false;
+        	});
+        	
+        	//Enable/disable standin text box.
+        	$(".standincheck").click(function(){
+        		
+        		$(this).parent().next().val("");
+        		$(this).parent().next().prop('disabled',!$(this).is(':checked'));
+        	});
+        	
+        	//Change teams.
+        	$("#team1").change(function(){
+        		
+        		$("#team1player1name").text(players[this.value][0]);
+        		$("#team1player2name").text(players[this.value][1]);
+        		$("#team1player3name").text(players[this.value][2]);
+        		$("#team1player4name").text(players[this.value][3]);
+        		$("#team1player5name").text(players[this.value][4]);
+        		
+        		
+        	});
+        	$("#team2").change(function(){
+        		
+        		$("#team2player1name").text(players[this.value][0]);
+        		$("#team2player2name").text(players[this.value][1]);
+        		$("#team2player3name").text(players[this.value][2]);
+        		$("#team2player4name").text(players[this.value][3]);
+        		$("#team2player5name").text(players[this.value][4]);
+        		
+        		
+        	});
+        	
+        	//Select a ban/pick (to change it)
+            $(".banpick").click(function(){
+            	$(".banpick").removeClass('selected');
+            	$(this).addClass('selected');
+            });
+            
+            //select a pick to move.
+            $(".movepick").click(function(){
+            	$(".movepick").removeClass('selected');
+            	$(this).addClass('selected');
+            	selectedmovepick=parseInt($(this)[0].id.replace("movepick",""));
+            });
+            
+            //Chose a hero for the next pick
+            $(".selecthero").click(function(){
+            	if ($(this).hasClass('chosen')) return;
+            	$(this).addClass('chosen');
+            	$("#banpick"+currentbanpick)[0].src=$(this)[0].src;
+            	$("#banpick"+currentbanpick+"b")[0].src=$(this)[0].src;
+            	heroname = $(this)[0].src.replace(".png","");
+            	heroname = heroname.substring(heroname.lastIndexOf("/")+1);
+            	if(radiantfirst)
+            	{
+            		if (currentbanpick in bans)
+            		{
+            			msg={};
+            			msg['type']='ban';
+            			msg['side']=sides[bans[currentbanpick][0]];
+            			msg['number']=bans[currentbanpick][1];
+            			msg['hero']=heroname;
+						console.log(sides[bans[currentbanpick][0]] + ", " + bans[currentbanpick][1] + ", " + heroname);
+						socket.emit('send', { message: JSON.stringify(msg)});
+					}
+					else
+					{
+						msg={};
+            			msg['type']='pick';
+            			pick = movepick[currentbanpick];
+            			if (pick>5)
+            			{
+            				msg['side']='radiant';
+            				msg['number']=pick-5;
+            			}
+            			else
+            			{
+            				msg['side']='dire';
+            				msg['number']=pick;
+            			}
+            			
+            			msg['hero']=heroname;
+						console.log(msg['side'] + ", " + msg['number'] + ", " + msg['hero']);
+						socket.emit('send', { message: JSON.stringify(msg)});
+					}
+					console.log('radiantfirst');
+            	}
+            	else
+            	{
+            		if (currentbanpick in bans)
+            		{
+            			msg={};
+            			msg['type']='ban';
+            			msg['side']=sides[bans[currentbanpick][0]];
+            			if (msg['side']==='radiant')
+            				msg['side']='dire';
+            			else
+            				msg['side']='radiant';
+            			msg['number']=bans[currentbanpick][1];
+            			msg['hero']=heroname;
+						console.log(sides[bans[currentbanpick][0]] + ", " + bans[currentbanpick][1] + ", " + heroname);
+						socket.emit('send', { message: JSON.stringify(msg)});
+					}
+					else
+					{
+						msg={};
+            			msg['type']='pick';
+            			pick = movepick[currentbanpick];
+            			if (pick<=5)
+            			{
+            				msg['side']='radiant';
+            				msg['number']=pick;
+            			}
+            			else
+            			{
+            				msg['side']='dire';
+            				msg['number']=pick-5;
+            			}
+            			
+            			msg['hero']=heroname;
+						console.log(msg['side'] + ", " + msg['number'] + ", " + msg['hero']);
+						socket.emit('send', { message: JSON.stringify(msg)});
+					}
+            	}
+            	if(movepick[currentbanpick]>0)
+            	{
+            		if(radiantfirst)
+            		{
+            			console.log("#movepick"+movepick[currentbanpick]);
+            			$("#movepick"+movepick[currentbanpick])[0].src=$(this)[0].src;
+            		}
+            		else
+            		{
+            			$("#movepick"+movepickdire[currentbanpick])[0].src=$(this)[0].src;
+            		}
+            	}
+            	$("#banpick"+currentbanpick).removeClass('selected');
+            	
+            	
+            	currentbanpick+=1;
+            	$("#banpick"+currentbanpick).addClass('selected');
+            	
+            });
+            
+            
+            //Submit matchinfo
+            $("#matchsubmit").click(function(){
+            	msg= {};
+            	msg['type']="team";
+            	msg['team1']=$("#team1").val();
+            	msg['team2']=$("#team2").val();
+            	msg['score1']=$("#score1").val();
+            	msg['score2']=$("#score2").val();
+            	msg['bestof']=$("#bestof").val();
+            	msg['teaminfo']={};
+            	msg['teaminfo']['radiant']=[];
+            	msg['teaminfo']['dire']=[];
+            	for(var i=1;i<6;i++)
+            	{
+            		if($("#standinradiantcheck"+i).is(':checked'))
+            		{
+            			var ans ={};
+            			ans['number']=i;
+            			ans['name']=$("#standinradiant"+i).val();
+            			 
+            			msg['teaminfo']['radiant'].concat(ans);
+            		}
+            		if($("#standindirecheck"+i).is(':checked'))
+            		{
+            			var ans ={};
+            			ans['number']=i;
+            			ans['name']=$("#standindire"+i).val();
+            			 
+            			msg['teaminfo']['dire'].concat(ans);
+            		}
+            	}
+            	
+            	socket.emit('send', { message: JSON.stringify(msg)});
+            });
+            $(".movesubmit").click(function(){
+            	msg= {};
+            	msg['type']="move";
+            	if(selectedmovepick>5)
+            	{
+            		msg['side']="Radiant";
+            		msg['lane']=$(this)[0].id;
+            		msg['target']=selectedmovepick-5;
+            	}
+            	else
+				{
+            		msg['side']="Dire";
+            		msg['lane']=$(this)[0].id;
+            		msg['target']=selectedmovepick;
+            	}           	
+            	
+            	socket.emit('send', { message: JSON.stringify(msg)});
+            });
+            
+            
+            $("#showteams").click(function(){
+            	msg= {};
+            	msg['type']="showteams";
+            	socket.emit('send', { message: JSON.stringify(msg)});
+            });
+            $("#showplayers").click(function(){
+            	msg= {};
+            	msg['type']="showplayers";
+            	socket.emit('send', { message: JSON.stringify(msg)});
+            });
+            $("#showskills").click(function(){
+            	msg= {};
+            	msg['type']="showskills";
+            	socket.emit('send', { message: JSON.stringify(msg)});
+            });
+            $("#showinfo").click(function(){
+            	msg= {};
+            	msg['type']="showinfo";
+            	socket.emit('send', { message: JSON.stringify(msg)});
+            });
+            
+        });
+        
+        
+</script>
+	</head>
 	<body>
-		Team 1:   Team 2:<br /><br />
+		<style>
+			.selected {-webkit-box-shadow: 0px 0px 10px rgba(255,125,125,0.8); -moz-box-shadow: 0px 0px 10px rgba(0,125,125,0.8); box-shadow: 4px 4px 4px rgba(0,0,255,0.8);}
+			.chosen{opacity:0.5}
+		</style>
 		
-		Player 1         Player 1
-		Player 2		 Player 2
-		Player 3		 Player 3
-		Player 4    	 Player 4
-		Player 5 		 Player 5
+		Team 1:   
+		<select id="team1">
+			<option value="-"> --- </option> 
+			<option value="navi">NaVi</option>
+			<option value="vp">VP</option>
+			<option value="liquid">Liquid</option>
+			<option value="fnatic">Fnatic</option>
+			<option value="alliance">Alliance</option>
+			<option value="eg">EG</option>
+		</select> 
+		Team 2:
+		<select id="team2">
+			<option value="-"> --- </option>
+			<option value="navi">NaVi</option>
+			<option value="vp">VP</option>
+			<option value="liquid">Liquid</option>
+			<option value="fnatic">Fnatic</option>
+			<option value="alliance">Alliance</option>
+			<option value="eg">EG</option>
+		</select>
+		
+				Bo:
+		<select id="bestof">
+			<option>Bo1</option>
+			<option>Bo2</option>
+			<option>Bo3</option>
+			<option>Bo5</option>
+		</select><br />
+		Score 1:   
+		<select id="score1"> 
+			<option>0</option>
+			<option>1</option>
+			<option>2</option>
+		</select> 
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Score 2:
+		<select id="score2">
+			<option>0</option>
+			<option>1</option>
+			<option>2</option>
+		</select>
+		<br /><br />
+		
+		<table>
+			<tbody>
+				<tr>
+					<td>
+						Team 1:<br /><br />
+		<span id="team1player1name">Player 1</span><label><input id="standinradiantcheck1" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standinradiant1" disabled value=""><br />
+		<span id="team1player2name">Player 2</span><label><input id="standinradiantcheck2" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standinradiant2" disabled value="">        		 <br />
+		<span id="team1player3name">Player 3</span><label><input id="standinradiantcheck3" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standinradiant3" disabled value="">        		 <br />
+		<span id="team1player4name">Player 4</span><label><input id="standinradiantcheck4" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standinradiant4" disabled value="">        		 <br />
+		<span id="team1player5name">Player 5</span><label><input id="standinradiantcheck5" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standinradiant5" disabled value="">        		 <br /><br />
+					</td>
+					<td>
+						Team 2:<br /><br />
+		<span id="team2player1name">Player 1</span><label><input id="standindirecheck1" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standindire1" disabled value=""><br />
+		<span id="team2player2name">Player 2</span><label><input id="standindirecheck2" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standindire2" disabled value="">        		 <br />
+		<span id="team2player3name">Player 3</span><label><input id="standindirecheck3" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standindire3" disabled value="">        		 <br />
+		<span id="team2player4name">Player 4</span><label><input id="standindirecheck4" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standindire4" disabled value="">        		 <br />
+		<span id="team2player5name">Player 5</span><label><input id="standindirecheck5" class="standincheck" type="checkbox" name="checkbox" value="value"> Standin</label> <input id="standindire5" disabled value="">        		 <br />
+		<br />
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		<button id="matchsubmit">Submit Match Info</button><br /><br />
+		
+		<hr/>
 		
 		
 		
-		Picks and Bans<br />
-		Dire first -- Radiant first<br />
 		
-		Dire ban 1 Radiant Ban 1 Dire Ban 2 Radiant Ban 2 Dire pick 1 Radiant pick 1 Radiant pick 2 Dire pick 2 Radiant Ban 3 Dire Ban 3 Radiant Ban 4 Dire Ban 4 Dire Pick 3 Radiant pick 3 Dire pick 4 Radiant pick 4 Radiant ban 5 Dire ban 5 Radiant pick 5 Dire pick 5<br />
 		
-		---------------------<br /><br />
+		
+		
+		Picks and Bans<br /><br />
+		<label><input type="radio" id="radiantfirstradio" name="radio" value="value"> Radiant first</label>  <label><input type="radio" id="direfirstradio" name="radio" value="value"> Dire first</label><br /><br />
+		<div id="radiantfirst">
+		<img id="banpick1" class="banpick" src="images/admin/radiantban1.png" class="selected">
+		<img id="banpick2" class="banpick" src="images/admin/direban1.png">
+		<img id="banpick3" class="banpick" src="images/admin/radiantban2.png">
+		<img id="banpick4" class="banpick" src="images/admin/direban2.png">
+		
+		<img id="banpick5" class="banpick" src="images/admin/radiantpick1.png">
+		<img id="banpick6" class="banpick" src="images/admin/direpick1.png">
+		<img id="banpick7" class="banpick" src="images/admin/direpick2.png">
+		<img id="banpick8" class="banpick" src="images/admin/radiantpick2.png"><br />
+		
+		<img id="banpick9" class="banpick" src="images/admin/radiantban3.png">
+		<img id="banpick10" class="banpick" src="images/admin/direban3.png">
+		<img id="banpick11" class="banpick" src="images/admin/radiantban4.png">
+		<img id="banpick12" class="banpick" src="images/admin/direban4.png">
+		
+		<img id="banpick13" class="banpick" src="images/admin/direpick3.png">
+		<img id="banpick14" class="banpick" src="images/admin/radiantpick3.png">
+		<img id="banpick15" class="banpick" src="images/admin/direpick4.png">
+		<img id="banpick16" class="banpick" src="images/admin/radiantpick4.png"><br />
+		
+		<img id="banpick17" class="banpick" src="images/admin/direban5.png">
+		<img id="banpick18" class="banpick" src="images/admin/radiantban5.png">
+		<img id="banpick19" class="banpick" src="images/admin/direpick5.png">
+		<img id="banpick20" class="banpick" src="images/admin/radiantpick5.png"><br />
+		</div>
+		
+		<div id="direfirst" style="display:none">
+		<img id="banpick1b" class="banpick" src="images/admin/direban1.png" class="selected">
+		<img id="banpick2b" class="banpick" src="images/admin/radiantban1.png">
+		<img id="banpick3b" class="banpick" src="images/admin/direban2.png">
+		<img id="banpick4b" class="banpick" src="images/admin/radiantban2.png">
+		
+		
+		
+		<img id="banpick5b" class="banpick" src="images/admin/direpick1.png">
+		<img id="banpick6b" class="banpick" src="images/admin/radiantpick1.png">
+		<img id="banpick7b" class="banpick" src="images/admin/radiantpick2.png">
+		<img id="banpick8b" class="banpick" src="images/admin/direpick2.png"><br />
+		
+		
+		<img id="banpick9b" class="banpick" src="images/admin/direban3.png">
+		<img id="banpick10b" class="banpick" src="images/admin/radiantban3.png">
+		<img id="banpick11b" class="banpick" src="images/admin/direban4.png">
+		<img id="banpick12b" class="banpick" src="images/admin/radiantban4.png">
+		
+		<img id="banpick13b" class="banpick" src="images/admin/radiantpick3.png">
+		<img id="banpick14b" class="banpick" src="images/admin/direpick3.png">
+		<img id="banpick15b" class="banpick" src="images/admin/radiantpick4.png">
+		<img id="banpick16b" class="banpick" src="images/admin/direpick4.png"><br />
+		
+		
+		<img id="banpick17b" class="banpick" src="images/admin/radiantban5.png">
+		<img id="banpick18b" class="banpick" src="images/admin/direban5.png">
+		<img id="banpick19b" class="banpick" src="images/admin/radiantpick5.png">
+		<img id="banpick20b" class="banpick" src="images/admin/direpick5.png"><br />
+		
+		</div>
+
+		
+<br /><br /><hr/>
+Picks:<br /><br />
+<img src="images/banicons/abaddon.png" class="selecthero">
+<img src="images/banicons/alchemist.png" class="selecthero">
+<img src="images/banicons/ancient_apparition.png" class="selecthero">
+<img src="images/banicons/antimage.png" class="selecthero">
+<img src="images/banicons/axe.png" class="selecthero">
+<img src="images/banicons/bane.png" class="selecthero">
+<img src="images/banicons/batrider.png" class="selecthero">
+<img src="images/banicons/beastmaster.png" class="selecthero">
+<img src="images/banicons/bloodseeker.png" class="selecthero">
+<img src="images/banicons/bounty_hunter.png" class="selecthero">
+<img src="images/banicons/brewmaster.png" class="selecthero">
+<img src="images/banicons/bristleback.png" class="selecthero">
+<img src="images/banicons/broodmother.png" class="selecthero">
+<img src="images/banicons/centaur_warrunner.png" class="selecthero">
+<img src="images/banicons/chaos_knight.png" class="selecthero">
+<img src="images/banicons/chen.png" class="selecthero">
+<img src="images/banicons/clinkz.png" class="selecthero">
+<img src="images/banicons/clockwerk.png" class="selecthero">
+<img src="images/banicons/crystal_maiden.png" class="selecthero">
+<img src="images/banicons/dark_seer.png" class="selecthero">
+<img src="images/banicons/dazzle.png" class="selecthero">
+<img src="images/banicons/death_prophet.png" class="selecthero">
+<img src="images/banicons/disruptor.png" class="selecthero">
+<img src="images/banicons/doom_bringer.png" class="selecthero">
+<img src="images/banicons/dragon_knight.png" class="selecthero">
+<img src="images/banicons/drow_ranger.png" class="selecthero">
+<img src="images/banicons/earthshaker.png" class="selecthero">
+<img src="images/banicons/elder_titan.png" class="selecthero">
+<img src="images/banicons/enchantress.png" class="selecthero">
+<img src="images/banicons/enigma.png" class="selecthero">
+<img src="images/banicons/faceless_void.png" class="selecthero">
+<img src="images/banicons/gyrocopter.png" class="selecthero">
+<img src="images/banicons/huskar.png" class="selecthero">
+<img src="images/banicons/invoker.png" class="selecthero">
+<img src="images/banicons/io.png" class="selecthero">
+<img src="images/banicons/jakiro.png" class="selecthero">
+<img src="images/banicons/juggernaut.png" class="selecthero">
+<img src="images/banicons/keeper_of_the_light.png" class="selecthero">
+<img src="images/banicons/kunkka.png" class="selecthero">
+<img src="images/banicons/leshrac.png" class="selecthero">
+<img src="images/banicons/lich.png" class="selecthero">
+<img src="images/banicons/lifestealer.png" class="selecthero">
+<img src="images/banicons/lina.png" class="selecthero">
+<img src="images/banicons/lion.png" class="selecthero">
+<img src="images/banicons/lone_druid.png" class="selecthero">
+<img src="images/banicons/luna.png" class="selecthero">
+<img src="images/banicons/lycanthrope.png" class="selecthero">
+<img src="images/banicons/magnus.png" class="selecthero">
+<img src="images/banicons/medusa.png" class="selecthero">
+<img src="images/banicons/meepo.png" class="selecthero">
+<img src="images/banicons/mirana.png" class="selecthero">
+<img src="images/banicons/morphling.png" class="selecthero">
+<img src="images/banicons/naga_siren.png" class="selecthero">
+<img src="images/banicons/nature's_prophet.png" class="selecthero">
+<img src="images/banicons/necrolyte.png" class="selecthero">
+<img src="images/banicons/night_stalker.png" class="selecthero">
+<img src="images/banicons/nyx_assassin.png" class="selecthero">
+<img src="images/banicons/ogre_magi.png" class="selecthero">
+<img src="images/banicons/omniknight.png" class="selecthero">
+<img src="images/banicons/outworld_devourer.png" class="selecthero">
+<img src="images/banicons/phantom_assassin.png" class="selecthero">
+<img src="images/banicons/phantom_lancer.png" class="selecthero">
+<img src="images/banicons/puck.png" class="selecthero">
+<img src="images/banicons/pudge.png" class="selecthero">
+<img src="images/banicons/pugna.png" class="selecthero">
+<img src="images/banicons/queen_of_pain.png" class="selecthero">
+<img src="images/banicons/razor.png" class="selecthero">
+<img src="images/banicons/riki.png" class="selecthero">
+<img src="images/banicons/rubick.png" class="selecthero">
+<img src="images/banicons/sand_king.png" class="selecthero">
+<img src="images/banicons/shadow_demon.png" class="selecthero">
+<img src="images/banicons/shadow_fiend.png" class="selecthero">
+<img src="images/banicons/shadow_shaman.png" class="selecthero">
+<img src="images/banicons/silencer.png" class="selecthero">
+<img src="images/banicons/skeleton_king.png" class="selecthero">
+<img src="images/banicons/skywrath_mage.png" class="selecthero">
+<img src="images/banicons/slardar.png" class="selecthero">
+<img src="images/banicons/slark.png" class="selecthero">
+<img src="images/banicons/sniper.png" class="selecthero">
+<img src="images/banicons/spectre.png" class="selecthero">
+<img src="images/banicons/spirit_breaker.png" class="selecthero">
+<img src="images/banicons/storm_spirit.png" class="selecthero">
+<img src="images/banicons/sven.png" class="selecthero">
+<img src="images/banicons/templar_assassin.png" class="selecthero">
+<img src="images/banicons/tidehunter.png" class="selecthero">
+<img src="images/banicons/timbersaw.png" class="selecthero">
+<img src="images/banicons/tinker.png" class="selecthero">
+<img src="images/banicons/tiny.png" class="selecthero">
+<img src="images/banicons/treant_protector.png" class="selecthero">
+<img src="images/banicons/troll_warlord.png" class="selecthero">
+<img src="images/banicons/tusk.png" class="selecthero">
+<img src="images/banicons/undying.png" class="selecthero">
+<img src="images/banicons/ursa.png" class="selecthero">
+<img src="images/banicons/vengeful_spirit.png" class="selecthero">
+<img src="images/banicons/venomancer.png" class="selecthero">
+<img src="images/banicons/viper.png" class="selecthero">
+<img src="images/banicons/visage.png" class="selecthero">
+<img src="images/banicons/warlock.png" class="selecthero">
+<img src="images/banicons/weaver.png" class="selecthero">
+<img src="images/banicons/windrunner.png" class="selecthero">
+<img src="images/banicons/witch_doctor.png" class="selecthero">
+<img src="images/banicons/zeus.png" class="selecthero"><br /><br /><hr />
 		
 		Move heroes <br />
+<table>
+	<tbody>
+		<tr>
+			<td><img id="movepick1" class="movepick" src="images/admin/direpick1.png"><br /></td>
+			<td><img id="movepick2" class="movepick" src="images/admin/direpick2.png"><br /></td>
+			<td><img id="movepick3" class="movepick" src="images/admin/direpick3.png"><br /></td>
+			<td><img id="movepick4" class="movepick" src="images/admin/direpick4.png"><br /></td>
+			<td><img id="movepick5" class="movepick" src="images/admin/direpick5.png"><br /></td>
+		</tr>
 		
-		Dire 1  Dire 2  Dire 3  Dire 4  Dire 5<br /><br />
-		Radiant 1 Radiant 2 Radiant 3 Radiant 4 Radiant 5<br /><br />
+		<tr>
+			<td><img id="movepick6" class="movepick" src="images/admin/radiantpick1.png"><br /></td>
+			<td><img id="movepick7" class="movepick" src="images/admin/radiantpick2.png"><br /></td>
+			<td><img id="movepick8" class="movepick" src="images/admin/radiantpick3.png"><br /></td>
+			<td><img id="movepick9" class="movepick" src="images/admin/radiantpick4.png"><br /></td>
+			<td><img id="movepick10" class="movepick" src="images/admin/radiantpick5.png"><br /></td>
+		</tr>
+	</tbody>	
+</table><br />
+<button id="Top" class="movesubmit">Top</button> 
+<button id="Mid" class="movesubmit">Mid</button> 
+<button id="Bottom" class="movesubmit">Bottom</button> 
+<button id="JungleSafe" class="movesubmit">JungleSafe</button> 
+<button id="JungleOff" class="movesubmit">JungleOff</button> 
+<button id="Roam" class="movesubmit">Roam</button>
+<label><input type="checkbox"> Force Funny</label>
+		<br /><hr/>
 		
-		Stats <br />
+		Stats <br /><br />
 		
-		Show Teams
-		Show Players
-		Player Stats
-		Team Stats
-		Hero 1
-		Hero 2
-		Hero Team
-		Matchup
-		Trilane
+		<button id="showteams">Show Teams</button>
+		<button id="showplayers">Show Players</button><br />
+		Player: <select><option>Dendi</option></select> <button id="showinfo">Player Stats</button><br />
+		Team: <select><option>NaVi</option></select> <button>Team Stats</button><br /><br />
+		Hero: <select><option>Abaddon</option></select> 
+		Info: <select><option>Winrate</option></select> <button>Hero Stats</button><button id="showskills">Show Skills</button><br /> 
+		
 		
 		
 		
