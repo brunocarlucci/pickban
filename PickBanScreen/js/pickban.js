@@ -322,9 +322,33 @@ var movepositions = {
 	direjunglesafe1:['654','114',300,
 			 '425','100',4600,
 			 '379','200',4600],
-				
+	
+	direroam1:['654','114',300,
+				   '482','114',600,
+				   '439','362',4000,
+				   '330','352',3000,
+				   '252','291',3600,
+				   '73','266',2600,
+				   '254','158',4000,
+				   '409','158',5000,
+				   '469','182',4000
+				   ],
+				   				
 	radiantmid1:['176','680',300,
 				'376','490',6300],
+				
+	radiantjungleoff1:['176','680',300,
+				'412' ,'456',6300,
+				'286' ,'283',5300,
+				'371' ,'189',3300
+				],
+				
+				
+	direjungleoff1:['715','220',300, 
+			 	'476','429',6300,
+				'586','526',4300,
+				'597','671',4300,
+				],
 	radiantbottom1:['228','800',300,
 				   '793','753',6300],
 	radianttop1:['61','638',300,
@@ -378,16 +402,14 @@ goToLane = function(target, lane, side, patrol)
 		}
 		else
 		{
+			$("."+balloon2).hide("scale");
 			if(patrol2>=0)
 			{
 				console.log('patrolling');
 				animationstep=patrol2*3;
 				goToLane2(hero2, balloon2,lane2, side2, patrol2, animationstep);
 			}
-			else
-			{
-				$("."+balloon2).hide("scale");
-			}
+			
 		}
 	};
 	$("."+balloon).css('left',($("."+hero).position().left-10)+"px");
@@ -417,11 +439,18 @@ goTopDire = function(target) {
 	if(!direlanes['top'].indexOf(target)>-1)
 		direlanes['top'].concat(target);
 } ;
-goJungleDire = function(target) {
+goJungleSafeDire = function(target) {
 	goToLane(target,'junglesafe','dire');
 	if(!direlanes['junglesafe'].indexOf(target)>-1)
 		direlanes['junglesafe'].concat(target);
 } ;
+
+goJungleOffDire = function(target) {
+	goToLane(target,'jungleoff','dire');
+	if(!direlanes['jungleoff'].indexOf(target)>-1)
+		direlanes['jungleoff'].concat(target);
+} ;
+
 
 goMidRadiant = function(target) {
 	goToLane(target,'mid','radiant');
@@ -441,10 +470,16 @@ goTopRadiant = function(target) {
 		radiantlanes['top'].concat(target);
 } ;
 
-goJungleRadiant = function(target) {
+goJungleSafeRadiant = function(target) {
 	goToLane(target,'junglesafe','radiant');
 	if(!radiantlanes['junglesafe'].indexOf(target)>-1)
 		radiantlanes['junglesafe'].concat(target);
+} ;
+
+goJungleOffRadiant = function(target) {
+	goToLane(target,'jungleoff','radiant');
+	if(!radiantlanes['jungleoff'].indexOf(target)>-1)
+		radiantlanes['jungleoff'].concat(target);
 } ;
 
 goRoamRadiant = function(target) {
@@ -452,6 +487,12 @@ goRoamRadiant = function(target) {
 	if(!radiantlanes['roam'].indexOf(target)>-1)
 		radiantlanes['roam'].concat(target);
 } ;
+goRoamDire = function(target) {
+	goToLane(target,'roam','dire',2);
+	if(!direlanes['roam'].indexOf(target)>-1)
+		direlanes['roam'].concat(target);
+} ;
+
 
 bounce = function(){
 	
